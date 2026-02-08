@@ -3,15 +3,15 @@ using UnityEngine;
 public class player_navigation : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float sprintMultiplier = 2f;
+    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private float sprintMultiplier = 3f;
 
     [Header("Camera Alignment")]
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private bool alignMovementWithCamera = true;
 
     [Header("Mouse Look")]
-    [SerializeField] private float mouseSensitivity = 2f;
+    [SerializeField] private float mouseSensitivity = 3f;
     [SerializeField] private bool holdRightMouseToLook = true;
     [SerializeField] private float minPitch = -80f;
     [SerializeField] private float maxPitch = 80f;
