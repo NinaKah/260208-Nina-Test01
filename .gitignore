@@ -9,9 +9,5 @@ Obj*/
 Logs/
 UserSettings/
 
-# Build Artefakte, die neu erzeugt werden koennen (lokal behalten, wenn gewuenscht)
-# Wenn du den WebGL-Build mit einchecken willst, nimm Build/ hier raus
-Build/
-
 # Sonstiges
 *.log
