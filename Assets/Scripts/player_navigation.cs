@@ -53,6 +53,12 @@ public class player_navigation : MonoBehaviour
     {
         HandleMouseLook();
 
+        // Debug / Fallback: Zur Ausgangsposition per "R"-Taste zurueckkehren
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetToStart();
+        }
+
         // WASD / Pfeiltasten Input ueber das alte Input System
         float horizontal = Input.GetAxisRaw("Horizontal");   // A/D, Links/Rechts
         float vertical   = Input.GetAxisRaw("Vertical");     // W/S, Vor/Zurueck
@@ -105,7 +111,7 @@ public class player_navigation : MonoBehaviour
         }
 
         transform.position += moveDirection * currentSpeed * Time.deltaTime
-                             + scrollMove * Time.deltaTime;
+                     + scrollMove * Time.deltaTime;
     }
 
     public void ResetToStart()
