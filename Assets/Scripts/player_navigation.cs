@@ -16,8 +16,16 @@ public class player_navigation : MonoBehaviour
     [SerializeField] private float minPitch = -80f;
     [SerializeField] private float maxPitch = 80f;
 
+    [Header("Scroll Movement")]
+    [SerializeField] private float scrollSpeed = 20f;
+
     private float yaw;   // Drehung um die Y-Achse (links/rechts)
     private float pitch; // Blick nach oben/unten
+
+    private Vector3 startPosition;
+    private Quaternion startRotation;
+    private float startYaw;
+    private float startPitch;
 
     private void Awake()
     {
@@ -26,12 +34,18 @@ public class player_navigation : MonoBehaviour
             cameraTransform = Camera.main.transform;
         }
 
+        startPosition = transform.position;
+        startRotation = transform.rotation;
+
         if (cameraTransform != null)
         {
             // Startwerte aus aktueller Transform übernehmen
             Vector3 euler = cameraTransform.rotation.eulerAngles;
             yaw = euler.y;
             pitch = euler.x;
+
+            startYaw = yaw;
+            startPitch = pitch;
         }
     }
 
@@ -42,6 +56,10 @@ public class player_navigation : MonoBehaviour
         // WASD / Pfeiltasten Input ueber das alte Input System
         float horizontal = Input.GetAxisRaw("Horizontal");   // A/D, Links/Rechts
         float vertical   = Input.GetAxisRaw("Vertical");     // W/S, Vor/Zurueck
+
+        // Scrollrad wie W/S fuer Vor-/Zurueckbewegung verwenden
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        vertical += scroll * scrollSpeed;
 
         Vector3 input = new Vector3(horizontal, 0f, vertical);
         if (input.sqrMagnitude > 1f)
@@ -76,6 +94,22 @@ public class player_navigation : MonoBehaviour
         }
 
         transform.position += moveDirection * currentSpeed * Time.deltaTime;
+    }
+
+    public void ResetToStart()
+    {
+        // Position und Rotation des Spielers zurücksetzen
+        transform.position = startPosition;
+        transform.rotation = startRotation;
+
+        // Blickrichtung zurücksetzen
+        yaw = startYaw;
+        pitch = startPitch;
+
+        if (cameraTransform != null)
+        {
+            cameraTransform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+        }
     }
 
     private void HandleMouseLook()
