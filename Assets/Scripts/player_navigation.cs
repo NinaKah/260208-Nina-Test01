@@ -57,10 +57,6 @@ public class player_navigation : MonoBehaviour
         float horizontal = Input.GetAxisRaw("Horizontal");   // A/D, Links/Rechts
         float vertical   = Input.GetAxisRaw("Vertical");     // W/S, Vor/Zurueck
 
-        // Scrollrad wie W/S fuer Vor-/Zurueckbewegung verwenden
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        vertical += scroll * scrollSpeed;
-
         Vector3 input = new Vector3(horizontal, 0f, vertical);
         if (input.sqrMagnitude > 1f)
             input.Normalize();
@@ -93,7 +89,23 @@ public class player_navigation : MonoBehaviour
             moveDirection = transform.TransformDirection(input);
         }
 
-        transform.position += moveDirection * currentSpeed * Time.deltaTime;
+        // Scrollrad separat als Vor-/Zurueckbewegung entlang der Blickrichtung auswerten
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        Vector3 scrollMove = Vector3.zero;
+        if (Mathf.Abs(scroll) > 0.0001f)
+        {
+            Vector3 forward = alignMovementWithCamera && cameraTransform != null
+                ? cameraTransform.forward
+                : transform.forward;
+
+            forward.y = 0f;
+            forward.Normalize();
+
+            scrollMove = forward * (scroll * scrollSpeed);
+        }
+
+        transform.position += moveDirection * currentSpeed * Time.deltaTime
+                             + scrollMove * Time.deltaTime;
     }
 
     public void ResetToStart()
