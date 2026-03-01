@@ -114,12 +114,15 @@
 
       loadingBar.style.display = "block";
 
+      var unityInstance = null;
+
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
+        }).then((instance) => {
+          unityInstance = instance;
           loadingBar.style.display = "none";
           fullscreenButton.onclick = () => {
             unityInstance.SetFullscreen(1);
@@ -129,6 +132,22 @@
         });
       };
       document.body.appendChild(script);
+
+      // Scroll steuert Videofortschritt in Unity (0..1)
+      function sendScrollToUnity() {
+        if (!unityInstance) return;
+
+        var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        if (maxScroll <= 0) return;
+
+        var scrollTop = window.scrollY || window.pageYOffset || 0;
+        var progress = scrollTop / maxScroll; // 0..1
+
+        // GameObject-Name: "ScrollControlledVideo"; Methode: "SetScrollProgress"
+        unityInstance.SendMessage("ScrollControlledVideo", "SetScrollProgress", progress.toString());
+      }
+
+      window.addEventListener("scroll", sendScrollToUnity);
     </script>
   </body>
 </html>
