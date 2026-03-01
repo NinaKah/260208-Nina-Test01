@@ -25,11 +25,20 @@ public class ScrollControlledVideo : MonoBehaviour
     [SerializeField]
     private float activationDistance = 3f; // ab dieser Distanz wird das Video gesteuert
 
+    [Header("Scroll-Steuerung")]
+    [SerializeField, Range(0f, 1f)]
+    private float smoothing = 0.2f; // wie weich das Scrubbing reagiert
+
+    [SerializeField]
+    private bool requireMouseOver = true; // nur scrollen, wenn Maus ueber dem Quad ist
+
     [SerializeField]
     [Range(0f, 1f)]
     private float currentProgress = 0f;
 
     private bool isPrepared;
+
+    private float targetProgress = 0f;
 
     private void Awake()
     {
@@ -110,13 +119,34 @@ public class ScrollControlledVideo : MonoBehaviour
             return;
         }
 
+        // Optional nur reagieren, wenn der Mauszeiger ueber diesem Quad ist
+        if (requireMouseOver && !IsMouseOverSelf())
+        {
+            return;
+        }
+
         // Optional nur reagieren, wenn wir nah genug dran sind
         if (useActivationDistance && !IsWithinActivationDistance())
         {
             return;
         }
 
-        currentProgress = Mathf.Clamp01(progress);
+        targetProgress = Mathf.Clamp01(progress);
+    }
+
+    private void Update()
+    {
+        if (!isPrepared || videoPlayer == null || autoPlayLoop)
+        {
+            return;
+        }
+
+        if (Mathf.Approximately(currentProgress, targetProgress))
+        {
+            return;
+        }
+
+        currentProgress = Mathf.Lerp(currentProgress, targetProgress, smoothing);
         ApplyProgress(currentProgress);
     }
 
@@ -137,6 +167,23 @@ public class ScrollControlledVideo : MonoBehaviour
             videoPlayer.Play();
             videoPlayer.Pause();
         }
+    }
+
+    private bool IsMouseOverSelf()
+    {
+        Camera cam = Camera.main;
+        if (cam == null)
+        {
+            return true; // falls keine Kamera gefunden wird, nicht blockieren
+        }
+
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            return hit.transform == transform;
+        }
+
+        return false;
     }
 
     private bool IsWithinActivationDistance()
