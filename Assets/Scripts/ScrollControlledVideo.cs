@@ -13,6 +13,9 @@ public class ScrollControlledVideo : MonoBehaviour
 
     [Header("Aktivierung nach Distanz")]
     [SerializeField]
+    private bool useActivationDistance = false;
+
+    [SerializeField]
     private Transform referenceTransform; // z.B. Kamera oder Spieler
 
     [SerializeField]
@@ -85,8 +88,8 @@ public class ScrollControlledVideo : MonoBehaviour
     // Kann auch direkt aus Unity (ohne JS) aufgerufen werden
     public void SetScrollProgress(float progress)
     {
-        // Nur reagieren, wenn wir nah genug dran sind
-        if (!IsWithinActivationDistance())
+        // Optional nur reagieren, wenn wir nah genug dran sind
+        if (useActivationDistance && !IsWithinActivationDistance())
         {
             return;
         }

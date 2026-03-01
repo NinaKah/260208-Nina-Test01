@@ -133,21 +133,28 @@
       };
       document.body.appendChild(script);
 
-      // Scroll steuert Videofortschritt in Unity (0..1)
-      function sendScrollToUnity() {
-        if (!unityInstance) return;
+      // Virtueller Scroll-Fortschritt (0..1), gesteuert per Mausrad
+      var scrollProgress = 0.0;
 
-        var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        if (maxScroll <= 0) return;
-
-        var scrollTop = window.scrollY || window.pageYOffset || 0;
-        var progress = scrollTop / maxScroll; // 0..1
-
-        // GameObject-Name: "ScrollControlledVideo"; Methode: "SetScrollProgress"
-        unityInstance.SendMessage("ScrollControlledVideo", "SetScrollProgress", progress.toString());
+      function clamp01(v) {
+        return v < 0 ? 0 : (v > 1 ? 1 : v);
       }
 
-      window.addEventListener("scroll", sendScrollToUnity);
+      function sendScrollProgressToUnity() {
+        if (!unityInstance) return;
+        unityInstance.SendMessage("ScrollControlledVideo", "SetScrollProgress", scrollProgress.toString());
+      }
+
+      window.addEventListener("wheel", function (event) {
+        if (!unityInstance) return;
+
+        var speed = 0.0015; // hoeher = schneller scrubben
+        scrollProgress = clamp01(scrollProgress + event.deltaY * speed);
+        sendScrollProgressToUnity();
+
+        // Verhindere Seitenscrollen, damit der Fokus auf dem Video bleibt
+        event.preventDefault();
+      }, { passive: false });
     </script>
   </body>
 </html>
