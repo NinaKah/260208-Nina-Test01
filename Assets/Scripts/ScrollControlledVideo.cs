@@ -13,7 +13,7 @@ public class ScrollControlledVideo : MonoBehaviour
 
     [Header("Debug / Test")] 
     [SerializeField]
-    private bool autoPlayLoop = true; // Zum Test: Video automatisch als Loop abspielen
+    private bool autoPlayLoop = false; // Standard: Scroll-Steuerung, kein Autoplay
 
     [Header("Aktivierung nach Distanz")]
     [SerializeField]
@@ -76,15 +76,18 @@ public class ScrollControlledVideo : MonoBehaviour
     {
         isPrepared = true;
 
-        // Testmodus: Video einfach in Dauerschleife abspielen
         if (autoPlayLoop)
         {
+            // Testmodus: Video einfach in Dauerschleife abspielen
             source.isLooping = true;
             source.Play();
-            return;
         }
-
-        ApplyProgress(currentProgress);
+        else
+        {
+            // Scrollmodus: Start auf Frame 0, pausiert
+            currentProgress = Mathf.Clamp01(currentProgress);
+            ApplyProgress(currentProgress);
+        }
     }
 
     // Wird von JavaScript via SendMessage("ScrollControlledVideo", "SetScrollProgress", progressString) aufgerufen
@@ -124,10 +127,16 @@ public class ScrollControlledVideo : MonoBehaviour
             return;
         }
 
-        // Canvas/Scroll steuert die Zeit direkt, Video bleibt pausiert
+        // Canvas/Scroll steuert die Zeit direkt, Video bleibt quasi pausiert,
+        // wir stoßen aber kurz ein Play/Pause an, damit der Frame sicher aktualisiert.
         var targetTime = progress * videoPlayer.length;
         videoPlayer.time = targetTime;
-        videoPlayer.Pause();
+
+        if (!videoPlayer.isPlaying)
+        {
+            videoPlayer.Play();
+            videoPlayer.Pause();
+        }
     }
 
     private bool IsWithinActivationDistance()
