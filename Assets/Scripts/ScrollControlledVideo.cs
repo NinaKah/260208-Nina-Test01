@@ -11,6 +11,10 @@ public class ScrollControlledVideo : MonoBehaviour
     [SerializeField]
     private string streamingAssetsFileName = "BA_Test_Scrollen_linear_01_VP8.webm";
 
+    [Header("Debug / Test")] 
+    [SerializeField]
+    private bool autoPlayLoop = true; // Zum Test: Video automatisch als Loop abspielen
+
     [Header("Aktivierung nach Distanz")]
     [SerializeField]
     private bool useActivationDistance = false;
@@ -71,6 +75,15 @@ public class ScrollControlledVideo : MonoBehaviour
     private void OnVideoPrepared(VideoPlayer source)
     {
         isPrepared = true;
+
+        // Testmodus: Video einfach in Dauerschleife abspielen
+        if (autoPlayLoop)
+        {
+            source.isLooping = true;
+            source.Play();
+            return;
+        }
+
         ApplyProgress(currentProgress);
     }
 
@@ -88,6 +101,12 @@ public class ScrollControlledVideo : MonoBehaviour
     // Kann auch direkt aus Unity (ohne JS) aufgerufen werden
     public void SetScrollProgress(float progress)
     {
+        // Wenn wir im Auto-Play-Testmodus sind, ignorieren wir Scroll-Eingaben
+        if (autoPlayLoop)
+        {
+            return;
+        }
+
         // Optional nur reagieren, wenn wir nah genug dran sind
         if (useActivationDistance && !IsWithinActivationDistance())
         {
