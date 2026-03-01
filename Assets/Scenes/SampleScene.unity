@@ -338,7 +338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   videoPlayer: {fileID: 207473397}
-  streamingAssetsFileName: BA_Test_Srollen_linear_01_VP8.webm
+  streamingAssetsFileName: BA_Test_Scrollen_linear_01_VP8.webm
   referenceTransform: {fileID: 2058309180}
   activationDistance: 15
   currentProgress: 0
